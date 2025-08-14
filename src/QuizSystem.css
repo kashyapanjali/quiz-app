@@ -1,0 +1,348 @@
+:root {
+	--purple-500: #7c3aed;
+	--purple-600: #6d28d9;
+	--blue-500: #3b82f6;
+	--blue-600: #2563eb;
+	--bg-gradient-start: rgba(124, 58, 237, 0.95);
+	--bg-gradient-mid: rgba(59, 130, 246, 0.95);
+	--bg-gradient-end: rgba(79, 70, 229, 0.95);
+	--card-bg: #ffffff;
+	--muted: #6b7280;
+	--green-600: #16a34a;
+	--yellow-600: #d97706;
+	--red-600: #dc2626;
+	--gray-50: #f9fafb;
+	--shadow-lg: 0 10px 30px rgba(2, 6, 23, 0.15);
+	--transition-fast: 0.2s ease;
+}
+
+/* Page layout */
+.app-root {
+	min-height: 100vh;
+	background: linear-gradient(
+		135deg,
+		var(--bg-gradient-start),
+		var(--bg-gradient-mid),
+		var(--bg-gradient-end)
+	);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	box-sizing: border-box;
+	font-family:
+		Inter,
+		system-ui,
+		-apple-system,
+		"Segoe UI",
+		Roboto,
+		"Helvetica Neue",
+		Arial;
+}
+
+/* Card base */
+.card {
+	background: var(--card-bg);
+	border-radius: 1.25rem;
+	box-shadow: var(--shadow-lg);
+	padding: 1.5rem;
+	/* max-width: 48rem; */
+	width: 100%;
+	box-sizing: border-box;
+	transition: transform var(--transition-fast);
+}
+
+.card:hover {
+	transform: scale(1.01);
+}
+
+/* Centered small card (start screen) */
+.card-center {
+	max-width: 28rem;
+	margin: 0 auto;
+	text-align: center;
+}
+
+/* Header/title area */
+.logo-circle {
+	width: 5rem;
+	height: 5rem;
+	border-radius: 9999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 0.75rem;
+	background: linear-gradient(90deg, var(--purple-500), var(--blue-500));
+	color: white;
+}
+
+.title {
+	font-size: 1.875rem;
+	font-weight: 700;
+	color: #1f2937;
+	margin-bottom: 0.25rem;
+}
+
+.subtitle {
+	color: var(--muted);
+	margin-bottom: 1rem;
+}
+
+/* Info rows */
+.info-row {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+	justify-content: center;
+	color: var(--muted);
+}
+
+/* Buttons */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.875rem 1.25rem;
+	border-radius: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	text-decoration: none;
+	transition:
+		transform var(--transition-fast),
+		opacity var(--transition-fast);
+	user-select: none;
+}
+
+.btn:active {
+	transform: translateY(1px);
+}
+
+.btn-primary {
+	background: linear-gradient(90deg, var(--purple-500), var(--blue-500));
+	color: white;
+	box-shadow: 0 6px 18px rgba(59, 130, 246, 0.18);
+}
+
+.btn-primary:hover {
+	filter: brightness(1.03);
+	transform: scale(1.02);
+}
+
+.btn-disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+/* error box */
+.alert-error {
+	margin-top: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.5rem;
+	background: #fee2e2;
+	border: 1px solid #fecaca;
+	color: #991b1b;
+}
+
+/* Quiz header */
+.quiz-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.75rem;
+}
+
+.badge {
+	padding: 0.25rem 0.6rem;
+	border-radius: 9999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	display: inline-block;
+}
+
+.badge.easy {
+	color: var(--green-600);
+	background: rgba(16, 185, 129, 0.08);
+}
+.badge.medium {
+	color: var(--yellow-600);
+	background: rgba(217, 119, 6, 0.06);
+}
+.badge.hard {
+	color: var(--red-600);
+	background: rgba(220, 38, 38, 0.06);
+}
+.badge.default {
+	color: #4b5563;
+	background: rgba(107, 114, 128, 0.06);
+}
+
+/* progress */
+.progress-track {
+	width: 100%;
+	height: 8px;
+	background: #e5e7eb;
+	border-radius: 9999px;
+	overflow: hidden;
+	margin-bottom: 1rem;
+}
+
+.progress-fill {
+	height: 100%;
+	background: linear-gradient(90deg, var(--purple-500), var(--blue-500));
+	border-radius: 9999px;
+	transition: width 0.3s ease;
+}
+
+/* Question block */
+.q-meta {
+	text-align: center;
+	color: var(--muted);
+	font-size: 0.9rem;
+	margin-bottom: 0.5rem;
+}
+.q-title {
+	text-align: center;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #111827;
+	line-height: 1.4;
+	margin-bottom: 0.75rem;
+}
+
+/* Answers grid */
+.answers-grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(1, 1fr);
+	margin-bottom: 1rem;
+}
+
+/* Answer button */
+.answer {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 1rem;
+	border-radius: 1rem;
+	background: #fff;
+	color: #111827;
+	border: 2px solid transparent;
+	cursor: pointer;
+	transition:
+		transform 0.15s ease,
+		box-shadow 0.15s ease,
+		background 0.15s ease;
+	box-shadow: 0 6px 18px rgba(2, 6, 23, 0.04);
+}
+
+.answer:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+}
+
+.answer .letter {
+	width: 2rem;
+	height: 2rem;
+	border-radius: 9999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	background: #f3f4f6;
+	color: #374151;
+}
+
+.answer-selected {
+	background: linear-gradient(90deg, var(--purple-500), var(--blue-500));
+	color: white;
+	box-shadow: 0 10px 30px rgba(59, 130, 246, 0.18);
+}
+
+.answer-selected .letter {
+	background: white;
+	color: var(--purple-500);
+}
+
+/* Next button row */
+.next-row {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 1rem;
+}
+
+/* Fixed score bubble */
+.fixed-score {
+	position: fixed;
+	right: 1.5rem;
+	bottom: 1.5rem;
+	background: white;
+	border-radius: 9999px;
+	padding: 0.75rem;
+	box-shadow: 0 10px 30px rgba(2, 6, 23, 0.12);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+/* Result card layout */
+.result-title {
+	text-align: center;
+	margin-bottom: 1rem;
+}
+.result-stats {
+	background: var(--gray-50);
+	border-radius: 1rem;
+	padding: 1rem;
+	margin-bottom: 1rem;
+}
+.stat-column {
+	text-align: center;
+}
+.stat-value {
+	font-size: 1.75rem;
+	font-weight: 700;
+}
+.stat-label {
+	color: var(--muted);
+}
+
+/* Review list */
+.review-list {
+	max-height: 16rem;
+	overflow: auto;
+	padding-right: 0.5rem;
+}
+.review-item {
+	display: flex;
+	gap: 0.75rem;
+	padding: 0.6rem;
+	border-radius: 0.6rem;
+	background: #fff;
+	border: 1px solid #f3f4f6;
+	align-items: flex-start;
+}
+.review-item + .review-item {
+	margin-top: 0.5rem;
+}
+
+.review-item .question {
+	font-weight: 600;
+	color: #111827;
+	margin-bottom: 0.25rem;
+}
+.review-item .answer-line {
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+/* Reset & responsiveness */
+@media (min-width: 768px) {
+	.answers-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.card-center {
+		max-width: 40rem;
+	}
+}

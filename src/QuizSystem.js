@@ -18,7 +18,7 @@ function QuizSystem() {
 	const [showResult, setShowResult] = useState(false);
 	const [timeLeft, setTimeLeft] = useState(30);
 	const [isActive, setIsActive] = useState(false);
-	const [answers, setAnswers] = useState([]);
+	const [selectedAnswers, setSelectedAnswers] = useState({}); // index -> answer
 	const [quizStarted, setQuizStarted] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
@@ -28,6 +28,7 @@ function QuizSystem() {
 		if (isActive && timeLeft > 0) {
 			interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
 		} else if (timeLeft === 0 && isActive) {
+			// Move to next question on timer end
 			handleNextQuestion();
 		}
 		return () => clearInterval(interval);
@@ -55,6 +56,7 @@ function QuizSystem() {
 				setQuestions(processed);
 				setCurrentQuestion(0);
 				setSelectedAnswer("");
+				setSelectedAnswers({});
 				setTimeLeft(30);
 				setIsActive(true);
 			} else {
@@ -88,30 +90,55 @@ function QuizSystem() {
 		loadQuestions();
 	};
 
-	const handleAnswerSelect = (answer) => setSelectedAnswer(answer);
+	const handleAnswerSelect = (answer) => {
+		setSelectedAnswer(answer);
+		setSelectedAnswers((prev) => ({
+			...prev,
+			[currentQuestion]: answer,
+		}));
+	};
 
 	const handleNextQuestion = () => {
 		if (!questions.length) return;
-		const isCorrect =
-			selectedAnswer === questions[currentQuestion].correct_answer;
-		setAnswers((prev) => [
-			...prev,
-			{
-				question: questions[currentQuestion].question,
-				selected: selectedAnswer,
-				correct: questions[currentQuestion].correct_answer,
-				isCorrect,
-			},
-		]);
-		if (isCorrect) setScore((s) => s + 1);
-		if (currentQuestion + 1 < questions.length) {
-			setCurrentQuestion((c) => c + 1);
-			setSelectedAnswer("");
+
+		// Save current selection (if any) - already saved on select, but ensure it's recorded
+		if (selectedAnswer) {
+			setSelectedAnswers((prev) => ({
+				...prev,
+				[currentQuestion]: selectedAnswer,
+			}));
+		}
+
+		const nextIndex = currentQuestion + 1;
+		if (nextIndex < questions.length) {
+			setCurrentQuestion(nextIndex);
+			// restore any previously selected answer for the new current question
+			setSelectedAnswer(selectedAnswers[nextIndex] || "");
 			setTimeLeft(30);
+			setIsActive(true);
 		} else {
+			// compute final score from selectedAnswers
+			let computedScore = 0;
+			for (let i = 0; i < questions.length; i++) {
+				const ans =
+					selectedAnswers[i] ??
+					(i === currentQuestion ? selectedAnswer : undefined);
+				if (ans === questions[i].correct_answer) computedScore++;
+			}
+			setScore(computedScore);
 			setShowResult(true);
 			setIsActive(false);
 		}
+	};
+
+	const jumpToQuestion = (index) => {
+		if (!questions.length) return;
+		setCurrentQuestion(index);
+		// restore any previously selected answer for that question
+		setSelectedAnswer(selectedAnswers[index] || "");
+		// reset timer for the jumped question
+		setTimeLeft(30);
+		setIsActive(true);
 	};
 
 	const resetQuiz = () => {
@@ -121,7 +148,7 @@ function QuizSystem() {
 		setShowResult(false);
 		setTimeLeft(30);
 		setIsActive(false);
-		setAnswers([]);
+		setSelectedAnswers({});
 		setQuizStarted(false);
 		setQuestions([]);
 		setError("");
@@ -259,47 +286,51 @@ function QuizSystem() {
 							Review Answers:
 						</h3>
 						<div>
-							{answers.map((answer, idx) => (
-								<div
-									key={idx}
-									className='review-item'>
-									{answer.isCorrect ?
-										<CheckCircle
-											style={{
-												width: 18,
-												height: 18,
-												color: "#16a34a",
-												marginTop: 2,
-											}}
-										/>
-									:	<XCircle
-											style={{
-												width: 18,
-												height: 18,
-												color: "#ef4444",
-												marginTop: 2,
-											}}
-										/>
-									}
-									<div style={{ flex: 1 }}>
-										<p className='question'>{answer.question}</p>
-										<p className='answer-line'>
-											Your answer:{" "}
-											<span
+							{questions.map((q, idx) => {
+								const userAns = selectedAnswers[idx];
+								const isCorrect = userAns === q.correct_answer;
+								return (
+									<div
+										key={idx}
+										className='review-item'>
+										{isCorrect ?
+											<CheckCircle
 												style={{
-													color: answer.isCorrect ? "#16a34a" : "#ef4444",
-												}}>
-												{answer.selected || "No answer"}
-											</span>
-										</p>
-										{!answer.isCorrect && (
-											<p style={{ color: "#16a34a" }}>
-												Correct answer: {answer.correct}
+													width: 18,
+													height: 18,
+													color: "#16a34a",
+													marginTop: 2,
+												}}
+											/>
+										:	<XCircle
+												style={{
+													width: 18,
+													height: 18,
+													color: "#ef4444",
+													marginTop: 2,
+												}}
+											/>
+										}
+										<div style={{ flex: 1 }}>
+											<p className='question'>{q.question}</p>
+											<p
+												className='answer-line'
+												style={{ marginBottom: 4 }}>
+												Your answer:{" "}
+												<span
+													style={{ color: isCorrect ? "#16a34a" : "#ef4444" }}>
+													{userAns || "No answer"}
+												</span>
 											</p>
-										)}
+											{!isCorrect && (
+												<p style={{ color: "#16a34a" }}>
+													Correct answer: {q.correct_answer}
+												</p>
+											)}
+										</div>
 									</div>
-								</div>
-							))}
+								);
+							})}
 						</div>
 					</div>
 
@@ -379,6 +410,24 @@ function QuizSystem() {
 
 					<div className='q-meta'>{currentQ.category}</div>
 					<h2 className='q-title'>{currentQ.question}</h2>
+
+					{/* QUESTION NAVIGATION */}
+					<div
+						className='question-nav'
+						style={{ margin: "12px 0 8px" }}>
+						{questions.map((_, idx) => (
+							<button
+								key={idx}
+								className={`nav-btn ${idx === currentQuestion ? "active" : ""} ${
+									selectedAnswers[idx] ? "answered" : ""
+								}`}
+								onClick={() => jumpToQuestion(idx)}
+								type='button'
+								title={`Go to question ${idx + 1}`}>
+								{idx + 1}
+							</button>
+						))}
+					</div>
 				</div>
 
 				<div
@@ -404,8 +453,12 @@ function QuizSystem() {
 					style={{ marginBottom: 20 }}>
 					<button
 						onClick={handleNextQuestion}
-						disabled={!selectedAnswer}
-						className={`btn btn-primary ${!selectedAnswer ? "btn-disabled" : ""}`}
+						disabled={!selectedAnswer && !selectedAnswers[currentQuestion]}
+						className={`btn btn-primary ${
+							!selectedAnswer && !selectedAnswers[currentQuestion] ?
+								"btn-disabled"
+							:	""
+						}`}
 						style={{
 							padding: "0.75rem 1.25rem",
 							borderRadius: 12,
@@ -425,7 +478,8 @@ function QuizSystem() {
 						style={{ width: 18, height: 18, color: "var(--purple-500)" }}
 					/>
 					<span style={{ fontWeight: 600 }}>
-						{score}/{questions.length}
+						{Object.values(selectedAnswers).filter(Boolean).length}/
+						{questions.length}
 					</span>
 				</div>
 			</div>

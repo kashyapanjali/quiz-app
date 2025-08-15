@@ -38,6 +38,7 @@ function QuizSystem() {
 		setLoading(true);
 		setError("");
 		try {
+			//fetch data from this api
 			const res = await fetch("https://opentdb.com/api.php?amount=15");
 			const data = await res.json();
 			if (data.response_code === 0 && data.results) {
